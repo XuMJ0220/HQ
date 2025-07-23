@@ -16,12 +16,12 @@ import (
 )
 
 func main() {
-	//初始化日志
-	logger.Init()
 	//初始化配置
 	settings.Init()
+	//初始化日志
+	logger.Init()
 	//初始化MySQL
-	mysql.Inti()
+	mysql.Init()
 	//初始化Redis
 
 	//注册路由
@@ -36,6 +36,7 @@ func main() {
 
 	go func() {
 		//服务连接
+		zap.L().Info("服务器启动", zap.String("地址", "http://0.0.0.0:8080"))
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			zap.L().Fatal("ListenAndServe", zap.Error(err))
 		}

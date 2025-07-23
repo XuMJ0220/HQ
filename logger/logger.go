@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"HQ/settings"
 	"flag"
 	"time"
 
@@ -10,8 +11,6 @@ import (
 )
 
 func Init() {
-	//flag解析
-	flag.Parse()
 	//创建有给全局的Logger
 	zap.ReplaceGlobals(zap.Must(zap.NewDevelopment()))
 
@@ -20,13 +19,13 @@ func Init() {
 func CreateLogger() *zap.Logger {
 	t := time.Now().Format("2006-01-02")
 
-	path := flag.Args()[0] + "./logs/" + t+".log"
+	path := flag.Args()[0] + "./logs/" + t+settings.AllCfg.Log.Filename
 	//输出到指定文件下，用lumberjack
 	file := zapcore.AddSync(&lumberjack.Logger{
 		Filename:   path,
-		MaxSize:    200,
-		MaxAge:     10,
-		MaxBackups: 10,
+		MaxSize:    settings.AllCfg.Log.MaxSize,
+		MaxAge:     settings.AllCfg.Log.MaxAge,
+		MaxBackups: settings.AllCfg.Log.MaxBackups,
 		Compress:   false,
 	})
 	//日志等级

@@ -1,1 +1,21 @@
-hello: world
+app: 
+  name: "HQ_APP"
+  port: 8080
+  version: "1.0.0"
+log:
+  level: "debug"
+  filename: "hq_app.log"
+  max_size: 200
+  max_age: 10
+  max_backups: 7
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  password: "ytfhqqkso1"
+  dbname: "hq"
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  password: "123465"
+  db: 0
