@@ -31,20 +31,3 @@ type User struct {
 func (User) TableName() string {
 	return "users"
 }
-
-// LoginParam 用户登录参数
-type LoginParam struct {
-	Username string `json:"username" form:"username" binding:"required"`
-	Password string `json:"password" form:"password" binding:"required"`
-}
-
-// UserResponse 用户信息响应（不包含敏感信息）
-type UserResponse struct {
-	ID         uint      `json:"id"`
-	UserID     int64     `json:"user_id"`
-	Username   string    `json:"username"`
-	Email      string    `json:"email"`
-	Gender     int8      `json:"gender"`
-	CreateTime time.Time `json:"create_time"`
-	UpdateTime time.Time `json:"update_time"`
-}
