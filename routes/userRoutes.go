@@ -9,5 +9,5 @@ import (
 func UserRoutes(router *gin.Engine) {
 	userRouter := router.Group("/user")
 
-	userRouter.POST("", controllers.UserController{}.Register)
+	userRouter.POST("/regist", controllers.UserController{}.Register)
 }

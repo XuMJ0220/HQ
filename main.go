@@ -5,6 +5,7 @@ import (
 	"HQ/dao/redis"
 	"HQ/logger"
 	"HQ/pkg/snowflake"
+	"HQ/pkg/validator"
 	"HQ/routes"
 	"HQ/settings"
 	"context"
@@ -22,6 +23,10 @@ func main() {
 	settings.Init()
 	//初始化日志
 	logger.Init()
+	//初始化验证器
+	if err := validator.InitTrans("zh"); err != nil {
+		zap.L().Error("Init validator failed", zap.Error(err))
+	}
 	//初始化MySQL
 	mysql.Init()
 	//初始化Redis
@@ -31,6 +36,10 @@ func main() {
 	//初始化雪花算法,用来实现分布式ID
 	if err := snowflake.Init("2025-01-01", 1); err != nil {
 		zap.L().Error("Init snowflake failed", zap.Error(err))
+	}
+	//初始化翻译器
+	if err := validator.InitTrans("zh"); err != nil {
+		zap.L().Error("Init trans failed", zap.Error(err))
 	}
 	//启动服务（优雅启动或停止）
 	//router := gin.Default()
