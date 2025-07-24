@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"HQ/models"
 	"fmt"
 	"reflect"
 	"strings"
@@ -14,13 +15,6 @@ import (
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
 )
 
-type RegisterParam struct {
-	Name       string `json:"name" form:"username" binding:"required"`
-	Email      string `json:"email" form:"email" binding:"required,email"`
-	Password   string `json:"password" form:"password" binding:"required"`
-	RePassword string `json:"re_password" form:"re_password" binding:"required,eqfield=Password"`
-}
-
 func RemoveTopStruct(fields map[string]string) map[string]string {
 	res := map[string]string{}
 	for field, err := range fields {
@@ -31,7 +25,7 @@ func RemoveTopStruct(fields map[string]string) map[string]string {
 
 // SignUpParamStructLevelValidation 自定义RegisterParam结构体校验函数
 func SignUpParamStructLevelValidation(sl validator.StructLevel) {
-	su := sl.Current().Interface().(RegisterParam)
+	su := sl.Current().Interface().(models.RegisterParam)
 
 	if su.Password != su.RePassword {
 		// 输出错误提示信息，最后一个参数就是传递的param
@@ -63,7 +57,7 @@ func InitTrans(locale string) (err error) {
 		})
 
 		// 为RegisterParam注册自定义校验方法
-		v.RegisterStructValidation(SignUpParamStructLevelValidation, RegisterParam{})
+		v.RegisterStructValidation(SignUpParamStructLevelValidation, models.RegisterParam{})
 
 		zhT := zh.New() // 中文翻译器
 		enT := en.New() // 英文翻译器

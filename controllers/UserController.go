@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"HQ/models"
 	"HQ/pkg/validator"
 	"net/http"
 
@@ -12,7 +13,7 @@ type UserController struct {
 }
 
 func (c UserController) Signup(ctx *gin.Context) {
-	registerParam := &validator.RegisterParam{}
+	registerParam := models.RegisterParam{}
 	//进行注册信息验证
 	if err := ctx.ShouldBindJSON(registerParam); err != nil {
 		errs, ok := err.(validatorPkg.ValidationErrors)
