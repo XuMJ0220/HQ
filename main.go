@@ -2,7 +2,10 @@ package main
 
 import (
 	"HQ/dao/mysql"
+	"HQ/dao/redis"
 	"HQ/logger"
+	"HQ/pkg/snowflake"
+	"HQ/routes"
 	"HQ/settings"
 	"context"
 	"net/http"
@@ -23,9 +26,13 @@ func main() {
 	//初始化MySQL
 	mysql.Init()
 	//初始化Redis
-
+	redis.Init()
 	//注册路由
-
+	routes.RoutesInit()
+	//初始化雪花算法,用来实现分布式ID
+	if err := snowflake.Init("2025-01-01", 1); err != nil {
+		zap.L().Error("Init snowflake failed", zap.Error(err))
+	}
 	//启动服务（优雅启动或停止）
 	router := gin.Default()
 

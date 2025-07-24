@@ -3,6 +3,7 @@ module HQ
 go 1.24.4
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/spf13/viper v1.20.1
