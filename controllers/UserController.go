@@ -11,7 +11,7 @@ import (
 type UserController struct {
 }
 
-func (c UserController) Register(ctx *gin.Context) {
+func (c UserController) Signup(ctx *gin.Context) {
 	registerParam := &validator.RegisterParam{}
 	//进行注册信息验证
 	if err := ctx.ShouldBindJSON(registerParam); err != nil {
@@ -29,13 +29,12 @@ func (c UserController) Register(ctx *gin.Context) {
 
 		}
 	} else {
+		//进行逻辑处理
+
 		//给客户端返回个消息
 		ctx.JSON(http.StatusOK, gin.H{
 			"msg": registerParam,
 		})
-		//进行逻辑处理
-
-		//数据入库
 	}
 
 }
