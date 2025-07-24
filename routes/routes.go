@@ -1,5 +1,11 @@
 package routes
 
-func RoutesInit() {
+import (
+	"github.com/gin-gonic/gin"
+)
 
+func RoutesInit() *gin.Engine {
+	router := gin.Default()
+	UserRoutes(router)
+	return router
 }

@@ -14,7 +14,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -28,13 +27,13 @@ func main() {
 	//初始化Redis
 	redis.Init()
 	//注册路由
-	routes.RoutesInit()
+	router := routes.RoutesInit()
 	//初始化雪花算法,用来实现分布式ID
 	if err := snowflake.Init("2025-01-01", 1); err != nil {
 		zap.L().Error("Init snowflake failed", zap.Error(err))
 	}
 	//启动服务（优雅启动或停止）
-	router := gin.Default()
+	//router := gin.Default()
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:8080",
