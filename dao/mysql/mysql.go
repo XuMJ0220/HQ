@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"HQ/models"
 	"HQ/settings"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -28,4 +29,13 @@ func Init() {
 	}
 	
 	zap.L().Info("MySQL连接成功")
+	
+	// 自动迁移数据库表结构
+	err = Db.AutoMigrate(&models.User{})
+	if err != nil {
+		zap.L().Error("数据库表迁移失败", zap.Error(err))
+		return
+	}
+	
+	zap.L().Info("数据库表迁移成功")
 }
