@@ -1,12 +1,13 @@
 package mysql
 
 import (
-	"fmt"
 	"HQ/models"
 	"HQ/settings"
+	"fmt"
+
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"go.uber.org/zap"
 )
 
 var Db *gorm.DB
@@ -19,7 +20,7 @@ func Init() {
 		settings.AllCfg.MySQL.Port,
 		settings.AllCfg.MySQL.DBName,
 	)
-	
+
 	var err error
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -27,15 +28,15 @@ func Init() {
 		zap.L().Info("请确保MySQL服务已启动，数据库已创建")
 		return
 	}
-	
+
 	zap.L().Info("MySQL连接成功")
-	
+
 	// 自动迁移数据库表结构
 	err = Db.AutoMigrate(&models.User{})
 	if err != nil {
 		zap.L().Error("数据库表迁移失败", zap.Error(err))
 		return
 	}
-	
+
 	zap.L().Info("数据库表迁移成功")
 }
