@@ -54,3 +54,41 @@ func (c UserController) Signup(ctx *gin.Context) {
 		}
 	}
 }
+
+func (c UserController) Login(ctx *gin.Context) {
+	//进行信息验证
+	loginParam := models.LoginParam{}
+	if err := ctx.ShouldBind(&loginParam); err != nil {
+		errs, ok := err.(validatorPkg.ValidationErrors)
+		if !ok {
+			//如果错误翻译失败了
+			ctx.JSON(http.StatusOK, gin.H{
+				"msg": err.Error(),
+			})
+
+		} else {
+			ctx.JSON(http.StatusOK, gin.H{
+				"msg": validator.RemoveTopStruct(errs.Translate(validator.Trans)),
+			})
+		}
+	} else {
+		//登录逻辑处理
+		if err:=logic.Login(loginParam);err!=nil{
+			if err==errors.New("用户名或密码错误"){
+				ctx.JSON(http.StatusOK, gin.H{
+					"msg": "用户名或密码错误",
+				})
+				return
+			}else{
+				ctx.JSON(http.StatusOK, gin.H{
+					"msg": err.Error(),
+				})
+				return 
+			}
+		}
+		//回复客户端
+		ctx.JSON(http.StatusOK, gin.H{
+			"msg": "登录成功",
+		})
+	}
+}

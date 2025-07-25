@@ -15,6 +15,13 @@ type RegisterParam struct {
 	RePassword string `json:"re_password" form:"re_password" binding:"required,eqfield=Password"`
 }
 
+// LoginParam 用户登录参数
+type LoginParam struct{
+	
+	Username string `json:"username" form:"username" binding:"required"`
+	Password string `json:"password" form:"password" binding:"required"`
+}
+
 // User 用户表对应的GORM模型
 type User struct {
 	ID        int64          `json:"id" gorm:"primaryKey;autoIncrement;column:id;comment:主键ID"`
