@@ -7,5 +7,6 @@ import (
 func RoutesInit() *gin.Engine {
 	router := gin.Default()
 	UserRoutes(router)
+	TestRoutes(router)
 	return router
 }
