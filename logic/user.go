@@ -3,13 +3,19 @@ package logic
 import (
 	"HQ/dao/mysql"
 	"HQ/models"
+	"HQ/pkg/JWT"
 	"HQ/pkg/snowflake"
 	"context"
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
+)
+
+var (
+	TokenDuration time.Duration = 24 * time.Hour
 )
 
 // Signup 注册
@@ -48,21 +54,26 @@ func Signup(registerParam models.RegisterParam) (int64, error) {
 }
 
 // Login 登录
-func Login(loginParam models.LoginParam) error {
+func Login(loginParam models.LoginParam) (string, error) {
 
 	//在Mysql中是否有对应的用户名
 	ctx := context.Background()
 	users, err := gorm.G[models.User](mysql.Db).
-	Select("username,password").
-	Where("username = ?", loginParam.Username).
-	Find(ctx)
-	if err!=nil{
-		return err
+		Select("username,password").
+		Where("username = ?", loginParam.Username).
+		Find(ctx)
+	if err != nil {
+		return "", err
 	}
 	//MD5加密
 	password := fmt.Sprintf("%x", md5.Sum([]byte(loginParam.Password)))
-	if len(users)==0 || users[0].Password!=password{
-		return errors.New("用户名或密码错误")
+	if len(users) == 0 || users[0].Password != password {
+		return "", errors.New("用户名或密码错误")
 	}
-	return nil
+	//生成token
+	token, err := JWT.GenLoginToken(loginParam, TokenDuration)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

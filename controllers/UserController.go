@@ -69,7 +69,7 @@ func (c UserController) Login(ctx *gin.Context) {
 		}
 	} else {
 		//登录逻辑处理
-		if err := logic.Login(loginParam); err != nil {
+		if token, err := logic.Login(loginParam); err != nil {
 			// if err == errors.New("用户名或密码错误") {
 			// 	ctx.JSON(http.StatusOK,
 			// 		CodeMsgDetail(CodeLoginFailed, "用户名或密码错误"))
@@ -82,9 +82,12 @@ func (c UserController) Login(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK,
 				CodeMsgDetail(CodeLoginFailed, err.Error()))
 			return
+		}else{
+			//回复客户端
+			ctx.JSON(http.StatusOK,
+			CodeMsgDetail(CodeLoginSuccess, gin.H{
+				"token": token,
+			}))
 		}
-		//回复客户端
-		ctx.JSON(http.StatusOK,
-			CodeMsgDetail(CodeLoginSuccess, ""))
 	}
 }
