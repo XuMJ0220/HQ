@@ -1,0 +1,104 @@
+basePath: /
+definitions:
+  models.APIResponse:
+    properties:
+      code:
+        description: 状态码
+        type: integer
+      detail:
+        description: 额外携带的详细信息
+      msg:
+        description: 状态消息
+        type: string
+    type: object
+  models.LoginParam:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.RegisterParam:
+    properties:
+      email:
+        type: string
+      gender:
+        maximum: 2
+        minimum: 0
+        type: integer
+      password:
+        type: string
+      re_password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - re_password
+    - username
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: 1044011439@qq.com
+    name: Xu Mingjie
+  description: 个人网站
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: 个人网站
+  version: 1.0.0
+paths:
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录
+      parameters:
+      - description: 用户登录
+        in: body
+        name: username
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: 用户登录
+      tags:
+      - user
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: 注册新用户
+      parameters:
+      - description: 用户注册
+        in: body
+        name: username
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: 注册新用户
+      tags:
+      - user
+swagger: "2.0"

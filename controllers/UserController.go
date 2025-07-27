@@ -14,6 +14,16 @@ type UserController struct {
 }
 
 // Signup 注册
+// @Summary 注册新用户
+// @Description  注册新用户
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param username body models.RegisterParam true "用户注册"
+// @Security ApiKeyAuth
+// @Success 200 {object} models.APIResponse
+// @Failure 200 {object} models.APIResponse
+// @Router /user/signup [post]
 func (c UserController) Signup(ctx *gin.Context) {
 	registerParam := models.RegisterParam{}
 	//进行注册信息验证
@@ -52,6 +62,17 @@ func (c UserController) Signup(ctx *gin.Context) {
 	}
 }
 
+// Login 登录
+// @Summary 用户登录
+// @Description 用户登录
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param username body models.LoginParam true "用户登录"
+// @Security ApiKeyAuth
+// @Success 200 {object} models.APIResponse
+// @Failure 200 {object} models.APIResponse
+// @Router /user/login [post]
 func (c UserController) Login(ctx *gin.Context) {
 	//进行信息验证
 	loginParam := models.LoginParam{}
@@ -82,12 +103,12 @@ func (c UserController) Login(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK,
 				CodeMsgDetail(CodeLoginFailed, err.Error()))
 			return
-		}else{
+		} else {
 			//回复客户端
 			ctx.JSON(http.StatusOK,
-			CodeMsgDetail(CodeLoginSuccess, gin.H{
-				"token": token,
-			}))
+				CodeMsgDetail(CodeLoginSuccess, gin.H{
+					"token": token,
+				}))
 		}
 	}
 }

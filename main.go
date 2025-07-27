@@ -18,6 +18,20 @@ import (
 	"go.uber.org/zap"
 )
 
+// @title 个人网站
+// @version 1.0.0
+// @description 个人网站
+
+// @contact.name Xu Mingjie
+// @contact.url
+// @contact.email 1044011439@qq.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /
+
 func main() {
 	//初始化配置
 	settings.Init()
