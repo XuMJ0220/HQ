@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(64) COLLATE utf8mb4_bin NOT NULL comment '密码',
     email VARCHAR(64) COLLATE utf8mb4_bin NOT NULL comment '邮箱',
     gender TINYINT(4) NOT NULL DEFAULT 0 COMMENT '性别：0-未知，1-男，2-女',
+    role TINYINT DEFAULT 0 COMMENT `0-普通用户，1-管理员`,
     `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP comment '创建时间',
     `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment '更新时间',
     `delete_time` timestamp NULL DEFAULT NULL comment '删除时间',
