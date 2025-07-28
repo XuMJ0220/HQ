@@ -11,6 +11,10 @@ type CategoriesParam struct {
 	Name string `json:"name"`
 }
 
+type CategoryName struct {
+	Name string `json:"name" binding:"required"`
+}
+
 type Categories struct {
 	ID        int64          `json:"id" gorm:"primarykey;autoIncrement;column:id;comment:主键ID"`
 	Name      string         `json:"name" gorm:"type:varchar(100);not null;column:name;comment:分类名称"`
