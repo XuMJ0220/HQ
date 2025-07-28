@@ -54,12 +54,12 @@ func Signup(registerParam models.RegisterParam) (int64, error) {
 }
 
 // Login 登录
-func Login(loginParam models.LoginParam) (string, error) {
+func Login(loginParam models.LoginParam, role *int8) (string, error) {
 
 	//在Mysql中是否有对应的用户名
 	ctx := context.Background()
 	users, err := gorm.G[models.User](mysql.Db).
-		Select("username,password").
+		Select("username,password,role").
 		Where("username = ?", loginParam.Username).
 		Find(ctx)
 	if err != nil {
@@ -70,8 +70,9 @@ func Login(loginParam models.LoginParam) (string, error) {
 	if len(users) == 0 || users[0].Password != password {
 		return "", errors.New("用户名或密码错误")
 	}
+	*role = users[0].Role
 	//生成token
-	token, err := JWT.GenLoginToken(loginParam, TokenDuration)
+	token, err := JWT.GenLoginToken(loginParam, users[0].Role, TokenDuration)
 	if err != nil {
 		return "", err
 	}

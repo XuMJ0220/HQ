@@ -10,6 +10,7 @@ import (
 
 type loginClaims struct {
 	Username             string `json:"username"`
+	Role                 int8   `json:"role"`
 	jwt.RegisteredClaims        //内嵌标准声明
 }
 
@@ -17,9 +18,10 @@ type loginClaims struct {
 var customSecret = []byte("HQgogogo")
 
 // GenLoginToken 生成登录token
-func GenLoginToken(loginParam models.LoginParam, dt time.Duration) (string, error) {
+func GenLoginToken(loginParam models.LoginParam,ro int8, dt time.Duration) (string, error) {
 	claims := loginClaims{
 		Username: loginParam.Username,
+		Role:     ro,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(dt)),
 			Issuer:    "HQ",

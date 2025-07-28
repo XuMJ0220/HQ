@@ -16,8 +16,7 @@ type RegisterParam struct {
 }
 
 // LoginParam 用户登录参数
-type LoginParam struct{
-	
+type LoginParam struct {
 	Username string `json:"username" form:"username" binding:"required"`
 	Password string `json:"password" form:"password" binding:"required"`
 }
@@ -30,6 +29,7 @@ type User struct {
 	Password  string         `json:"-" gorm:"type:varchar(64);not null;column:password;comment:密码"`
 	Email     string         `json:"email" gorm:"type:varchar(64);not null;uniqueIndex:idx_email;column:email;comment:邮箱"`
 	Gender    int8           `json:"gender" gorm:"type:tinyint(4);not null;default:0;column:gender;comment:性别：0-未知，1-男，2-女"`
+	Role      int8           `json:"role" gorm:"type:tinyint(4);default:0;column:role;comment:角色：0-普通用户，1-管理员"`
 	CreatedAt time.Time      `json:"create_time" gorm:"autoCreateTime;column:create_time;comment:创建时间"`
 	UpdatedAt time.Time      `json:"update_time" gorm:"autoUpdateTime;column:update_time;comment:更新时间"`
 	DeletedAt gorm.DeletedAt `json:"delete_time,omitempty" gorm:"index;column:delete_time;comment:删除时间"`

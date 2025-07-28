@@ -89,8 +89,10 @@ func (c UserController) Login(ctx *gin.Context) {
 					validator.RemoveTopStruct(errs.Translate(validator.Trans))))
 		}
 	} else {
+		var role int8
 		//登录逻辑处理
-		if token, err := logic.Login(loginParam); err != nil {
+		token, err := logic.Login(loginParam, &role)
+		if err != nil {
 			// if err == errors.New("用户名或密码错误") {
 			// 	ctx.JSON(http.StatusOK,
 			// 		CodeMsgDetail(CodeLoginFailed, "用户名或密码错误"))
@@ -104,11 +106,20 @@ func (c UserController) Login(ctx *gin.Context) {
 				CodeMsgDetail(CodeLoginFailed, err.Error()))
 			return
 		} else {
-			//回复客户端
-			ctx.JSON(http.StatusOK,
-				CodeMsgDetail(CodeLoginSuccess, gin.H{
-					"token": token,
-				}))
+			// 是普通用户
+			if role == 0 {
+				ctx.JSON(http.StatusOK,
+					CodeMsgDetail(CodeLoginSuccess, gin.H{
+						"role":  "普通用户",
+						"token": token,
+					}))
+			} else {
+				ctx.JSON(http.StatusOK,
+					CodeMsgDetail(CodeAdminLogin, gin.H{
+						"role":  "管理员",
+						"token": token,
+					}))
+			}
 		}
 	}
 }
