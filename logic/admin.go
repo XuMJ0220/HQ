@@ -13,7 +13,7 @@ import (
 // QueryAllCategories 查询所有分类
 func QueryAllCategories(categories *[]models.CategoriesParam) error {
 	ctx := context.Background()
-	cates, err := gorm.G[models.Categories](mysql.Db).Select("id,name").Find(ctx)
+	cates, err := gorm.G[models.Category](mysql.Db).Select("id,name").Find(ctx)
 	//如果查询失败
 	if err != nil {
 		return err
@@ -29,9 +29,9 @@ func QueryAllCategories(categories *[]models.CategoriesParam) error {
 }
 
 // QueryOneCategory 查询一个分类
-func QueryOneCategory(categoryId int64,name *string) error {
+func QueryOneCategory(categoryId int64, name *string) error {
 	ctx := context.Background()
-	cat, err := gorm.G[models.Categories](mysql.Db).Select("id,name").Where("id = ?", categoryId).First(ctx)
+	cat, err := gorm.G[models.Category](mysql.Db).Select("id,name").Where("id = ?", categoryId).First(ctx)
 	//如果查询失败
 	if err != nil {
 		logger.CreateLogger().Error("QueryOneCategory failed",
@@ -45,7 +45,7 @@ func QueryOneCategory(categoryId int64,name *string) error {
 
 func AddCategory(categoryName string) error {
 	ctx := context.Background()
-	if err := gorm.G[models.Categories](mysql.Db).Create(ctx, &models.Categories{
+	if err := gorm.G[models.Category](mysql.Db).Create(ctx, &models.Category{
 		Name: categoryName,
 	}); err != nil {
 		logger.CreateLogger().Error("AddCategory failed",
@@ -59,7 +59,7 @@ func AddCategory(categoryName string) error {
 // UpdateCategory 更新分类
 func UpdateCategory(categoryId int64, categoryName string) error {
 	ctx := context.Background()
-	result := mysql.Db.WithContext(ctx).Model(&models.Categories{}).Where("id = ?", categoryId).Update("name", categoryName)
+	result := mysql.Db.WithContext(ctx).Model(&models.Category{}).Where("id = ?", categoryId).Update("name", categoryName)
 	if result.Error != nil {
 		logger.CreateLogger().Error("UpdateCategory failed",
 			zap.Error(result.Error),
@@ -79,7 +79,7 @@ func UpdateCategory(categoryId int64, categoryName string) error {
 
 func DeleteCategory(categoryId int64) error {
 	ctx := context.Background()
-	_, err := gorm.G[models.Categories](mysql.Db).Where("id = ?", categoryId).Delete(ctx)
+	_, err := gorm.G[models.Category](mysql.Db).Where("id = ?", categoryId).Delete(ctx)
 	if err != nil {
 		logger.CreateLogger().Error("DeleteCategory failed",
 			zap.Error(err),

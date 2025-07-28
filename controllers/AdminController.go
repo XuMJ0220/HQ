@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"HQ/logger"
 	"HQ/logic"
 	"HQ/models"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 var (
@@ -25,7 +27,7 @@ type CategoriesController struct {
 // @Tags categories
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {object} models.APIResponse 
+// @Success 200 {object} models.APIResponse
 // @Failure 500 {object} models.APIResponse
 // @Router /admin/categories [get]
 func (c CategoriesController) GetAllCategories(ctx *gin.Context) {
@@ -34,6 +36,8 @@ func (c CategoriesController) GetAllCategories(ctx *gin.Context) {
 	err := logic.QueryAllCategories(&categories)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, CodeMsgDetail(CodeQueryFailed, err.Error()))
+		logger.CreateLogger().Error("GetAllCategories failed",
+			zap.Error(err))
 		return
 	}
 	//2.返回给客户端
