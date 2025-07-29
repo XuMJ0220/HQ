@@ -1,5 +1,27 @@
 basePath: /
 definitions:
+  models.APINoteCreateSuccessResponse:
+    properties:
+      code:
+        description: 状态码
+        type: integer
+      detail:
+        allOf:
+        - $ref: '#/definitions/models.NoteResponse'
+        description: 详细信息
+      msg:
+        description: 状态信息
+        type: string
+    type: object
+  models.APINoteFailed:
+    properties:
+      code:
+        type: integer
+      delete:
+        type: string
+      msg:
+        type: string
+    type: object
   models.APIResponse:
     properties:
       code:
@@ -18,6 +40,24 @@ definitions:
     required:
     - name
     type: object
+  models.CreateNoteParam:
+    properties:
+      category_id:
+        type: integer
+      content_md:
+        type: string
+      status:
+        enum:
+        - 0
+        - 1
+        type: integer
+      title:
+        type: string
+    required:
+    - category_id
+    - content_md
+    - title
+    type: object
   models.LoginParam:
     properties:
       password:
@@ -27,6 +67,28 @@ definitions:
     required:
     - password
     - username
+    type: object
+  models.NoteResponse:
+    properties:
+      author_name:
+        type: string
+      category_name:
+        type: string
+      contend_html:
+        type: string
+      contend_md:
+        type: string
+      create_at:
+        type: string
+      id:
+        example: "0"
+        type: string
+      status:
+        type: integer
+      title:
+        type: string
+      update_at:
+        type: string
     type: object
   models.RegisterParam:
     properties:
@@ -60,7 +122,7 @@ info:
   title: 个人网站
   version: 1.0.0
 paths:
-  /admin/categories:
+  /api/v1/admin/categories:
     get:
       description: 获取所有分类名称
       produces:
@@ -110,7 +172,7 @@ paths:
       summary: 添加一个分类
       tags:
       - categories
-  /admin/categories/{id}:
+  /api/v1/admin/categories/{id}:
     delete:
       description: 根据ID删除分类
       parameters:
@@ -203,6 +265,38 @@ paths:
       summary: 更新一个分类
       tags:
       - categories
+  /api/v1/admin/notes:
+    post:
+      consumes:
+      - application/json
+      description: 创建新的笔记
+      parameters:
+      - description: 笔记信息
+        in: body
+        name: note
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateNoteParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建笔记成功
+          schema:
+            $ref: '#/definitions/models.APINoteCreateSuccessResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/models.APINoteFailed'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.APINoteFailed'
+      security:
+      - ApiKeyAuth: []
+      summary: 添加一个笔记
+      tags:
+      - notes
   /user/login:
     post:
       consumes:

@@ -4,6 +4,7 @@ import (
 	"HQ/logger"
 	"HQ/logic"
 	"HQ/models"
+	"HQ/pkg/JWT"
 	"net/http"
 	"strconv"
 
@@ -13,12 +14,16 @@ import (
 
 var (
 	CategoryAddSuccess = "添加成功"
+	NoteAddFailed      = "参数错误"
 )
 
 type AdminController struct {
 }
 
 type CategoriesController struct {
+}
+
+type NotesController struct {
 }
 
 // GetAllCategories 获取所有分类名称
@@ -29,7 +34,7 @@ type CategoriesController struct {
 // @Security ApiKeyAuth
 // @Success 200 {object} models.APIResponse
 // @Failure 500 {object} models.APIResponse
-// @Router /admin/categories [get]
+// @Router /api/v1/admin/categories [get]
 func (c CategoriesController) GetAllCategories(ctx *gin.Context) {
 	categories := []models.CategoriesParam{}
 	//1.查数据库
@@ -54,7 +59,7 @@ func (c CategoriesController) GetAllCategories(ctx *gin.Context) {
 // @Success 200 {object} models.APIResponse
 // @Failure 400 {object} models.APIResponse
 // @Failure 500 {object} models.APIResponse
-// @Router /admin/categories/{id} [get]
+// @Router /api/v1/admin/categories/{id} [get]
 func (c CategoriesController) QueryOneCategory(ctx *gin.Context) {
 	//1.绑定参数
 	idStr := ctx.Param("id")
@@ -88,7 +93,7 @@ func (c CategoriesController) QueryOneCategory(ctx *gin.Context) {
 // @Success 200 {object} models.APIResponse "添加成功"
 // @Failure 400 {object} models.APIResponse "请求参数错误"
 // @Failure 500 {object} models.APIResponse "服务器内部错误"
-// @Router /admin/categories [post]
+// @Router /api/v1/admin/categories [post]
 func (c CategoriesController) AddCategory(ctx *gin.Context) {
 	//1.绑定数据
 	categoryName := models.CategoryName{}
@@ -117,7 +122,7 @@ func (c CategoriesController) AddCategory(ctx *gin.Context) {
 // @Success 200 {object} models.APIResponse "更新成功"
 // @Failure 400 {object} models.APIResponse "请求参数错误"
 // @Failure 500 {object} models.APIResponse "服务器内部错误"
-// @Router /admin/categories/{id} [put]
+// @Router /api/v1/admin/categories/{id} [put]
 func (c CategoriesController) UpdateCategory(ctx *gin.Context) {
 	//1.绑定参数
 	idStr := ctx.Param("id")
@@ -150,7 +155,7 @@ func (c CategoriesController) UpdateCategory(ctx *gin.Context) {
 // @Success 200 {object} models.APIResponse
 // @Failure 400 {object} models.APIResponse "请求参数错误"
 // @Failure 500 {object} models.APIResponse "服务器内部错误"
-// @Router /admin/categories/{id} [delete]
+// @Router /api/v1/admin/categories/{id} [delete]
 func (c CategoriesController) DeleteCategory(ctx *gin.Context) {
 	//1.绑定参数
 	idStr := ctx.Param("id")
@@ -167,4 +172,56 @@ func (c CategoriesController) DeleteCategory(ctx *gin.Context) {
 	}
 	//3.返回给客户端
 	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeDeleteSuccess, "删除成功"))
+}
+
+// AddNote 添加一个笔记
+// @Summary 添加一个笔记
+// @Description 创建新的笔记
+// @Tags notes
+// @Accept json
+// @Produce json
+// @Param note body models.CreateNoteParam true "笔记信息" example({"title": "新笔记标题", "contentMD": "新笔记内容", "categoryID": 1, "status": 1})
+// @Security ApiKeyAuth
+// @Success 200 {object} models.APINoteCreateSuccessResponse "创建笔记成功"
+// @Failure 400 {object} models.APINoteFailed "请求参数错误"
+// @Failure 500 {object} models.APINoteFailed "服务器内部错误"
+// @Router /api/v1/admin/notes [post]
+func (c NotesController) AddNote(ctx *gin.Context) {
+	//1.参数绑定
+	createNoteParam := models.CreateNoteParam{}
+	if err := ctx.ShouldBindJSON(&createNoteParam); err != nil {
+		ctx.JSON(http.StatusBadRequest, CodeMsgDetail(CodeCreateNoteFailed, err.Error()))
+		logger.CreateLogger().Error("AddNote failed",
+			zap.Error(err))
+		return
+	}
+
+	//2.获取用户信息
+	claimsInterface, _ := ctx.Get("claims")
+	// 类型断言
+	claims, ok := claimsInterface.(*JWT.LoginClaims)
+	if !ok {
+		ctx.JSON(http.StatusUnauthorized, CodeMsgDetail(CodeHeaderAuthFailed, NoteAddFailed))
+		return
+	}
+
+	//3.创建笔记条目
+	note, err := logic.CreateNote(createNoteParam, claims.UserId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, CodeMsgDetail(CodeCreateNoteFailed, err.Error()))
+		return
+	}
+	//4.返回给客户端
+	noteResponse := models.NoteResponse{
+		ID:           note.ID,
+		AutherName:   note.Author.Username,
+		CategoryName: note.Category.Name,
+		Title:        note.Title,
+		ContendMD:    note.ContentMD,
+		ContendHTML:  note.ContentHTML,
+		Status:       note.Status,
+		CreateAt:     note.CreatedAt,
+		UpdateAt:     note.UpdatedAt,
+	}
+	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeCreateNoteSuccess, noteResponse))
 }

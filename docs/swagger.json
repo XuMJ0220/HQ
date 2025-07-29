@@ -16,7 +16,7 @@
     "host": "localhost:8080",
     "basePath": "/",
     "paths": {
-        "/admin/categories": {
+        "/api/v1/admin/categories": {
             "get": {
                 "security": [
                     {
@@ -96,7 +96,7 @@
                 }
             }
         },
-        "/admin/categories/{id}": {
+        "/api/v1/admin/categories/{id}": {
             "get": {
                 "security": [
                     {
@@ -242,6 +242,57 @@
                 }
             }
         },
+        "/api/v1/admin/notes": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建新的笔记",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "添加一个笔记",
+                "parameters": [
+                    {
+                        "description": "笔记信息",
+                        "name": "note",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateNoteParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建笔记成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteCreateSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    }
+                }
+            }
+        },
         "/user/login": {
             "post": {
                 "security": [
@@ -322,6 +373,41 @@
         }
     },
     "definitions": {
+        "models.APINoteCreateSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "状态码",
+                    "type": "integer"
+                },
+                "detail": {
+                    "description": "详细信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.NoteResponse"
+                        }
+                    ]
+                },
+                "msg": {
+                    "description": "状态信息",
+                    "type": "string"
+                }
+            }
+        },
+        "models.APINoteFailed": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "delete": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
         "models.APIResponse": {
             "type": "object",
             "properties": {
@@ -349,6 +435,32 @@
                 }
             }
         },
+        "models.CreateNoteParam": {
+            "type": "object",
+            "required": [
+                "category_id",
+                "content_md",
+                "title"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "content_md": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1
+                    ]
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "models.LoginParam": {
             "type": "object",
             "required": [
@@ -360,6 +472,39 @@
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.NoteResponse": {
+            "type": "object",
+            "properties": {
+                "author_name": {
+                    "type": "string"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "contend_html": {
+                    "type": "string"
+                },
+                "contend_md": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "update_at": {
                     "type": "string"
                 }
             }

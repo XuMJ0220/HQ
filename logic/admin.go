@@ -4,8 +4,12 @@ import (
 	"HQ/dao/mysql"
 	"HQ/logger"
 	"HQ/models"
+	"bytes"
 	"context"
 
+	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
+	"github.com/yuin/goldmark/renderer/html"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -77,6 +81,7 @@ func UpdateCategory(categoryId int64, categoryName string) error {
 	return nil
 }
 
+// DeleteCategory 删除分类
 func DeleteCategory(categoryId int64) error {
 	ctx := context.Background()
 	_, err := gorm.G[models.Category](mysql.Db).Where("id = ?", categoryId).Delete(ctx)
@@ -87,4 +92,52 @@ func DeleteCategory(categoryId int64) error {
 		return err
 	}
 	return nil
+}
+
+func CreateNote(createNoteParam models.CreateNoteParam, authorID int64) (models.Note, error) {
+	var htmlBuffer bytes.Buffer
+	//用glodmark渲染
+	markdown := goldmark.New(
+		// 启用代码高亮扩展
+		goldmark.WithExtensions(
+			highlighting.NewHighlighting(
+				// 你可以选择不同的高亮主题, 比如 "github", "monokai", "dracula"
+				highlighting.WithStyle("dracula"),
+				highlighting.WithFormatOptions(),
+			),
+		),
+		// 配置渲染器选项
+		goldmark.WithRendererOptions(
+			// 允许在Markdown中书写原生的HTML标签，比如 <div>, <br>
+			// 注意：如果你允许用户提交内容，这可能有安全风险(XSS)，但对于你自己的个人网站是安全的。
+			html.WithUnsafe(),
+		),
+	)
+	if err := markdown.Convert([]byte(createNoteParam.ContentMD), &htmlBuffer); err != nil {
+		logger.CreateLogger().Error("CreateNote failed",
+			zap.Error(err),
+			zap.String("contentMD", createNoteParam.ContentMD))
+		return models.Note{}, err
+	}
+	htmlContent := htmlBuffer.String()
+	note := models.Note{
+		Title:       createNoteParam.Title,
+		ContentMD:   createNoteParam.ContentMD,
+		CategoryID:  createNoteParam.CategoryID,
+		Status:      createNoteParam.Status,
+		AuthorID:    authorID,
+		ContentHTML: htmlContent,
+	}
+	ctx := context.Background()
+
+	err := gorm.G[models.Note](mysql.Db).Create(ctx, &note)
+	if err != nil {
+		logger.CreateLogger().Error("CreateNote failed",
+			zap.Error(err),
+			zap.String("contentMD", createNoteParam.ContentMD))
+		return models.Note{}, err
+	}
+	//预加载作者和分类
+	mysql.Db.Preload("Author").Preload("Category").Find(&note)
+	return note, nil
 }

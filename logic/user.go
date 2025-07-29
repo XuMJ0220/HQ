@@ -72,7 +72,7 @@ func Login(loginParam models.LoginParam, role *int8) (string, error) {
 	}
 	*role = users[0].Role
 	//生成token
-	token, err := JWT.GenLoginToken(loginParam, users[0].Role, TokenDuration)
+	token, err := JWT.GenLoginToken(loginParam, users[0].Role, users[0].UserID, TokenDuration)
 	if err != nil {
 		return "", err
 	}

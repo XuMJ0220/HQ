@@ -24,6 +24,26 @@ type Note struct {
 	Category Category `json:"category" gorm:"foreignKey:CategoryID"`
 }
 
+// CreateNoteParam 创建笔记参数
+type CreateNoteParam struct {
+	Title      string `json:"title" binding:"required"`
+	ContentMD  string `json:"content_md" binding:"required"`
+	CategoryID int64  `json:"category_id" binding:"required"`
+	Status     uint8  `json:"status" binding:"oneof=0 1"`
+}
+
+type NoteResponse struct {
+	ID           int64     `json:"id,string"`
+	AutherName   string    `json:"author_name"`
+	CategoryName string    `json:"category_name"`
+	Title        string    `json:"title"`
+	ContendMD    string    `json:"contend_md"`
+	ContendHTML  string    `json:"contend_html"`
+	Status       uint8     `json:"status"`
+	CreateAt     time.Time `json:"create_at"`
+	UpdateAt     time.Time `json:"update_at"`
+}
+
 // TableName 指定表名
 func (Note) TableName() string {
 	return "notes"
