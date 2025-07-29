@@ -270,6 +270,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.APINotesGetSuccessResponse"
                         }
                     },
+                    "404": {
+                        "description": "笔记不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    },
                     "500": {
                         "description": "服务器内部错误",
                         "schema": {
@@ -329,6 +335,56 @@ const docTemplate = `{
             }
         },
         "/api/v1/admin/notes/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据ID获取笔记",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "获取一个笔记",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "笔记ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取笔记成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteGetSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    },
+                    "404": {
+                        "description": "笔记不存在",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -497,6 +553,20 @@ const docTemplate = `{
                 },
                 "delete": {
                     "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.APINoteGetSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "detail": {
+                    "$ref": "#/definitions/models.NoteResponse"
                 },
                 "msg": {
                     "type": "string"

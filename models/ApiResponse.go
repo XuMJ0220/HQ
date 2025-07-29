@@ -24,6 +24,13 @@ type APINoteDelSuccessResponse struct{
 	Detail string `json:"detail"`
 }
 
+type APINoteGetSuccessResponse struct {
+	Code   int    `json:"code"`
+	Msg    string `json:"msg"`
+	Detail NoteResponse `json:"detail"`
+}
+
+
 type APINoteFailed struct {
 	Code   int    `json:"code"`
 	Msg    string `json:"msg"`

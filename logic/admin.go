@@ -152,6 +152,9 @@ func GetNotes(notes *[]models.NoteResponse) error {
 			zap.Error(err))
 		return err
 	}
+	if len(ns) == 0 {
+		return gorm.ErrRecordNotFound
+	}
 	for _, v := range ns {
 		(*notes) = append((*notes), models.NoteResponse{
 			ID:           v.ID,
@@ -164,6 +167,29 @@ func GetNotes(notes *[]models.NoteResponse) error {
 			UpdateAt:     v.UpdatedAt,
 		})
 	}
+	return nil
+}
+
+func GetNote(id int64, noteResponse *models.NoteResponse) error {
+	note := []models.Note{}
+	err := mysql.Db.Preload("Author").Preload("Category").Where("id = ?", id).Find(&note).Error
+	if err != nil {
+		logger.CreateLogger().Error("GetNote failed",
+			zap.Error(err),
+			zap.Int64("id", id))
+		return err
+	}
+	if len(note) == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	noteResponse.ID = note[0].ID
+	noteResponse.Title = note[0].Title
+	noteResponse.ContendMD = note[0].ContentMD
+	noteResponse.ContendHTML = note[0].ContentHTML
+	noteResponse.CategoryName = note[0].Category.Name
+	noteResponse.AutherName = note[0].Author.Username
+	noteResponse.CreateAt = note[0].CreatedAt
+	noteResponse.UpdateAt = note[0].UpdatedAt
 	return nil
 }
 

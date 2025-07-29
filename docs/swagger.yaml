@@ -31,6 +31,15 @@ definitions:
       msg:
         type: string
     type: object
+  models.APINoteGetSuccessResponse:
+    properties:
+      code:
+        type: integer
+      detail:
+        $ref: '#/definitions/models.NoteResponse'
+      msg:
+        type: string
+    type: object
   models.APINotesGetSuccessResponse:
     properties:
       code:
@@ -298,6 +307,10 @@ paths:
           description: 获取笔记成功
           schema:
             $ref: '#/definitions/models.APINotesGetSuccessResponse'
+        "404":
+          description: 笔记不存在
+          schema:
+            $ref: '#/definitions/models.APINoteFailed'
         "500":
           description: 服务器内部错误
           schema:
@@ -365,6 +378,38 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: 删除一个笔记
+      tags:
+      - notes
+    get:
+      description: 根据ID获取笔记
+      parameters:
+      - description: 笔记ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取笔记成功
+          schema:
+            $ref: '#/definitions/models.APINoteGetSuccessResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/models.APINoteFailed'
+        "404":
+          description: 笔记不存在
+          schema:
+            $ref: '#/definitions/models.APINoteFailed'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.APINoteFailed'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取一个笔记
       tags:
       - notes
   /user/login:

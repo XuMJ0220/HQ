@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 var (
@@ -234,6 +235,7 @@ func (c NotesController) AddNote(ctx *gin.Context) {
 // @Produce json
 // @Security ApiKeyAuth
 // @Success 200 {object} models.APINotesGetSuccessResponse "获取笔记成功"
+// @Failure 404 {object} models.APINoteFailed "笔记不存在"
 // @Failure 500 {object} models.APINoteFailed "服务器内部错误"
 // @Router /api/v1/admin/notes [get]
 func (c NotesController) GetAllNotes(ctx *gin.Context) {
@@ -241,11 +243,49 @@ func (c NotesController) GetAllNotes(ctx *gin.Context) {
 	notes := []models.NoteResponse{}
 	err := logic.GetNotes(&notes)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, CodeMsgDetail(CodeGetNotesFailed, err.Error()))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, CodeMsgDetail(CodeGetNotesFailed, err.Error()))
 		return
 	}
 	//2.返回给客户端
 	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeGetNotesSuccess, notes))
+}
+
+// GetOneNote 获取一个笔记
+// @Summary 获取一个笔记
+// @Description 根据ID获取笔记
+// @Tags notes
+// @Param id path int true "笔记ID"
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.APINoteGetSuccessResponse "获取笔记成功"
+// @Failure 400 {object} models.APINoteFailed "请求参数错误"
+// @Failure 404 {object} models.APINoteFailed "笔记不存在"
+// @Failure 500 {object} models.APINoteFailed "服务器内部错误"
+// @Router /api/v1/admin/notes/{id} [get]
+func (c NotesController) GetOneNote(ctx *gin.Context) {
+	//1.绑定参数
+	idStr := ctx.Param("id")
+	nodeId, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, CodeMsgDetail(CodeGetNoteFailed, err.Error()))
+		return
+	}
+	//2.查询一则笔记
+	note := models.NoteResponse{}
+	if err := logic.GetNote(nodeId, &note); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, CodeMsgDetail(CodeGetNoteFailed, err.Error()))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, CodeMsgDetail(CodeGetNoteFailed, err.Error()))
+		return
+	}
+	//3.返回给客户端
+	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeGetNoteSuccess, note))
 }
 
 // DeleteNote 删除一个笔记

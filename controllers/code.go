@@ -25,6 +25,8 @@ const (
 	CodeCreateNoteFailed
 	CodeGetNotesSuccess
 	CodeGetNotesFailed
+	CodeGetNoteSuccess
+	CodeGetNoteFailed
 	CodeDelNoteSuccess
 	CodeDelNoteFailed
 )
@@ -50,6 +52,8 @@ var codeMsgMap = map[ResCode]string{
 	CodeCreateNoteFailed:  "添加笔记失败",
 	CodeGetNotesSuccess:   "获取笔记成功",
 	CodeGetNotesFailed:    "获取笔记失败",
+	CodeGetNoteSuccess:    "获取一则笔记成功",
+	CodeGetNoteFailed:     "获取一则笔记失败",
 	CodeDelNoteSuccess:    "删除笔记成功",
 	CodeDelNoteFailed:     "删除笔记失败",
 }
