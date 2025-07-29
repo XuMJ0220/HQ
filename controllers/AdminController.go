@@ -15,6 +15,7 @@ import (
 var (
 	CategoryAddSuccess = "添加成功"
 	NoteAddFailed      = "参数错误"
+	NoteDelSuccess     = "删除成功"
 )
 
 type AdminController struct {
@@ -245,4 +246,32 @@ func (c NotesController) GetAllNotes(ctx *gin.Context) {
 	}
 	//2.返回给客户端
 	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeGetNotesSuccess, notes))
+}
+
+// DeleteNote 删除一个笔记
+// @Summary 删除一个笔记
+// @Description 根据ID删除笔记
+// @Tags notes
+// @Param id path int true "笔记ID"
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.APINoteDelSuccessResponse "删除笔记成功"
+// @Failure 400 {object} models.APINoteFailed "请求参数错误"
+// @Failure 500 {object} models.APINoteFailed "服务器内部错误"
+// @Router /api/v1/admin/notes/{id} [delete]
+func (c NotesController) DeleteNote(ctx *gin.Context) {
+	//1.绑定参数
+	idStr := ctx.Param("id")
+	nodeId, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, CodeMsgDetail(CodeDelNoteFailed, err.Error()))
+		return
+	}
+	//2.删除笔记条目
+	if err := logic.DeleNote(nodeId); err != nil {
+		ctx.JSON(http.StatusInternalServerError, CodeMsgDetail(CodeDelNoteFailed, err.Error()))
+		return
+	}
+	//3.返回给客户端
+	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeDelNoteSuccess, NoteDelSuccess))
 }

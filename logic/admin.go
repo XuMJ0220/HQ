@@ -94,6 +94,7 @@ func DeleteCategory(categoryId int64) error {
 	return nil
 }
 
+// CreateNote 创建笔记
 func CreateNote(createNoteParam models.CreateNoteParam, authorID int64) (models.Note, error) {
 	var htmlBuffer bytes.Buffer
 	//用glodmark渲染
@@ -142,6 +143,7 @@ func CreateNote(createNoteParam models.CreateNoteParam, authorID int64) (models.
 	return note, nil
 }
 
+// GetNotes 获取所有笔记
 func GetNotes(notes *[]models.NoteResponse) error {
 	ns := []models.Note{}
 	err := mysql.Db.Preload("Author").Preload("Category").Find(&ns).Error
@@ -161,6 +163,18 @@ func GetNotes(notes *[]models.NoteResponse) error {
 			CreateAt:     v.CreatedAt,
 			UpdateAt:     v.UpdatedAt,
 		})
+	}
+	return nil
+}
+
+func DeleNote(id int64) error {
+	ctx := context.Background()
+	_, err := gorm.G[models.Note](mysql.Db).Where("id = ?", id).Delete(ctx)
+	if err != nil {
+		logger.CreateLogger().Error("DeleNote failed",
+			zap.Error(err),
+			zap.Int64("id", id))
+		return err
 	}
 	return nil
 }

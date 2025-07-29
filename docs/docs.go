@@ -328,6 +328,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/admin/notes/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据ID删除笔记",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "删除一个笔记",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "笔记ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "删除笔记成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteDelSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    }
+                }
+            }
+        },
         "/user/login": {
             "post": {
                 "security": [
@@ -425,6 +471,20 @@ const docTemplate = `{
                 },
                 "msg": {
                     "description": "状态信息",
+                    "type": "string"
+                }
+            }
+        },
+        "models.APINoteDelSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "msg": {
                     "type": "string"
                 }
             }
