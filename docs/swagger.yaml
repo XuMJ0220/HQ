@@ -22,6 +22,20 @@ definitions:
       msg:
         type: string
     type: object
+  models.APINotesGetSuccessResponse:
+    properties:
+      code:
+        description: 状态码
+        type: integer
+      detail:
+        description: 详细信息
+        items:
+          $ref: '#/definitions/models.NoteResponse'
+        type: array
+      msg:
+        description: 状态信息
+        type: string
+    type: object
   models.APIResponse:
     properties:
       code:
@@ -266,6 +280,24 @@ paths:
       tags:
       - categories
   /api/v1/admin/notes:
+    get:
+      description: 获取所有笔记
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取笔记成功
+          schema:
+            $ref: '#/definitions/models.APINotesGetSuccessResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/models.APINoteFailed'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取所有笔记
+      tags:
+      - notes
     post:
       consumes:
       - application/json

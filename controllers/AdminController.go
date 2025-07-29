@@ -225,3 +225,24 @@ func (c NotesController) AddNote(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeCreateNoteSuccess, noteResponse))
 }
+
+// GetAllNotes 获取所有笔记
+// @Summary 获取所有笔记
+// @Description 获取所有笔记
+// @Tags notes
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.APINotesGetSuccessResponse "获取笔记成功"
+// @Failure 500 {object} models.APINoteFailed "服务器内部错误"
+// @Router /api/v1/admin/notes [get]
+func (c NotesController) GetAllNotes(ctx *gin.Context) {
+	//1.数据库中查询所有要返回给客户端的笔记条目
+	notes := []models.NoteResponse{}
+	err := logic.GetNotes(&notes)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, CodeMsgDetail(CodeGetNotesFailed, err.Error()))
+		return
+	}
+	//2.返回给客户端
+	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeGetNotesSuccess, notes))
+}

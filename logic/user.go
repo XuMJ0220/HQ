@@ -59,7 +59,7 @@ func Login(loginParam models.LoginParam, role *int8) (string, error) {
 	//在Mysql中是否有对应的用户名
 	ctx := context.Background()
 	users, err := gorm.G[models.User](mysql.Db).
-		Select("username,password,role").
+		Select("username,password,role,user_id").
 		Where("username = ?", loginParam.Username).
 		Find(ctx)
 	if err != nil {

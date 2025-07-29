@@ -141,3 +141,26 @@ func CreateNote(createNoteParam models.CreateNoteParam, authorID int64) (models.
 	mysql.Db.Preload("Author").Preload("Category").Find(&note)
 	return note, nil
 }
+
+func GetNotes(notes *[]models.NoteResponse) error {
+	ns := []models.Note{}
+	err := mysql.Db.Preload("Author").Preload("Category").Find(&ns).Error
+	if err != nil {
+		logger.CreateLogger().Error("GetNotes failed",
+			zap.Error(err))
+		return err
+	}
+	for _, v := range ns {
+		(*notes) = append((*notes), models.NoteResponse{
+			ID:           v.ID,
+			AutherName:   v.Author.Username,
+			CategoryName: v.Category.Name,
+			Title:        v.Title,
+			ContendMD:    v.ContentMD,
+			ContendHTML:  v.ContentHTML,
+			CreateAt:     v.CreatedAt,
+			UpdateAt:     v.UpdatedAt,
+		})
+	}
+	return nil
+}

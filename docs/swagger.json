@@ -243,6 +243,35 @@
             }
         },
         "/api/v1/admin/notes": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取所有笔记",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "获取所有笔记",
+                "responses": {
+                    "200": {
+                        "description": "获取笔记成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINotesGetSuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -404,6 +433,26 @@
                     "type": "string"
                 },
                 "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.APINotesGetSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "状态码",
+                    "type": "integer"
+                },
+                "detail": {
+                    "description": "详细信息",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.NoteResponse"
+                    }
+                },
+                "msg": {
+                    "description": "状态信息",
                     "type": "string"
                 }
             }

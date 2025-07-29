@@ -22,4 +22,5 @@ func AdminRoutes(router *gin.Engine) {
 	notesRouter := v1.Group("notes")
 
 	notesRouter.POST("/", controllers.NotesController{}.AddNote) //添加一则笔记
+	notesRouter.GET("/", controllers.NotesController{}.GetAllNotes) //查询所有笔记
 }

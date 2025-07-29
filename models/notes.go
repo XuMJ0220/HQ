@@ -20,7 +20,7 @@ type Note struct {
 	DeletedAt   gorm.DeletedAt `json:"delete_time,omitempty" gorm:"index;column:delete_time;comment:删除时间"`
 
 	//建立关联关系
-	Author   User     `json:"author" gorm:"foreignKey:AuthorID"`
+	Author   User     `json:"author" gorm:"foreignKey:AuthorID;references:UserID"`
 	Category Category `json:"category" gorm:"foreignKey:CategoryID"`
 }
 
