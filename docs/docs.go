@@ -385,6 +385,59 @@ const docTemplate = `{
                     }
                 }
             },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "根据ID更新笔记",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notes"
+                ],
+                "summary": "更新一个笔记",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "笔记ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "笔记信息",
+                        "name": "note",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateNoteParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "更新笔记成功",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteUpdateSuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/models.APINoteFailed"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -573,6 +626,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.APINoteUpdateSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
         "models.APINotesGetSuccessResponse": {
             "type": "object",
             "properties": {
@@ -718,6 +785,24 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateNoteParam": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "content_md": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "用指针来判断是否更新",
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }

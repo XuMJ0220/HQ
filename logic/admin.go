@@ -193,6 +193,72 @@ func GetNote(id int64, noteResponse *models.NoteResponse) error {
 	return nil
 }
 
+func UpdateNote(id int64, updateNoteParam models.UpdateNoteParam) error {
+	//1.根据id查询记录是否存在
+	note := models.Note{}
+	if err := mysql.Db.Where("id = ?", id).First(&note).Error; err != nil {
+		logger.CreateLogger().Error("UpdateNote failed",
+			zap.Error(err),
+			zap.Int64("id", id))
+		return err
+	}
+	//创建一个map来更新字段
+	updataData := make(map[string]any)
+	if updateNoteParam.Title != "" {
+		updataData["title"] = updateNoteParam.Title
+	}
+	if updateNoteParam.CategoryID != 0 {
+		updataData["category_id"] = updateNoteParam.CategoryID
+	}
+	if updateNoteParam.Status != nil {
+		updataData["status"] = *(updateNoteParam.Status)
+	}
+	if updateNoteParam.ContentMD != "" {
+		updataData["content_md"] = updateNoteParam.ContentMD
+
+		var htmlBuffer bytes.Buffer
+		//用glodmark渲染
+		markdown := goldmark.New(
+			// 启用代码高亮扩展
+			goldmark.WithExtensions(
+				highlighting.NewHighlighting(
+					// 你可以选择不同的高亮主题, 比如 "github", "monokai", "dracula"
+					highlighting.WithStyle("dracula"),
+					highlighting.WithFormatOptions(),
+				),
+			),
+			// 配置渲染器选项
+			goldmark.WithRendererOptions(
+				// 允许在Markdown中书写原生的HTML标签，比如 <div>, <br>
+				// 注意：如果你允许用户提交内容，这可能有安全风险(XSS)，但对于你自己的个人网站是安全的。
+				html.WithUnsafe(),
+			),
+		)
+		if err := markdown.Convert([]byte(updateNoteParam.ContentMD), &htmlBuffer); err != nil {
+			logger.CreateLogger().Error("UpdateNote failed",
+				zap.Error(err),
+				zap.String("contentMD", updateNoteParam.ContentMD))
+			return err
+		}
+		htmlContent := htmlBuffer.String()
+
+		updataData["content_html"] = htmlContent
+	}
+
+	//如果笔记没有更改，直接返回
+	if len(updataData) == 0 {
+		return nil
+	}
+	//往数据库更新
+	if err := mysql.Db.Model(&models.Note{}).Where("id = ?", id).Updates(updataData).Error; err != nil {
+		logger.CreateLogger().Error("UpdateNote failed",
+			zap.Error(err),
+			zap.Int64("id", id))
+		return err
+	}
+	return nil
+}
+
 func DeleNote(id int64) error {
 	ctx := context.Background()
 	_, err := gorm.G[models.Note](mysql.Db).Where("id = ?", id).Delete(ctx)

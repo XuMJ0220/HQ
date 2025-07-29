@@ -17,6 +17,7 @@ var (
 	CategoryAddSuccess = "添加成功"
 	NoteAddFailed      = "参数错误"
 	NoteDelSuccess     = "删除成功"
+	NoteUpdateSuccess  = "更新成功"
 )
 
 type AdminController struct {
@@ -286,6 +287,40 @@ func (c NotesController) GetOneNote(ctx *gin.Context) {
 	}
 	//3.返回给客户端
 	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeGetNoteSuccess, note))
+}
+
+// UpdateNote 更新一个笔记
+// @Summary 更新一个笔记
+// @Description 根据ID更新笔记
+// @Tags notes
+// @Param id path int true "笔记ID"
+// @Param note body models.UpdateNoteParam true "笔记信息"
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} models.APINoteUpdateSuccessResponse "更新笔记成功"
+// @Failure 400 {object} models.APINoteFailed "请求参数错误"
+// @Failure 500 {object} models.APINoteFailed "服务器内部错误"
+// @Router /api/v1/admin/notes/{id} [put]
+func (c NotesController) UpdateNote(ctx *gin.Context) {
+	//1.绑定参数
+	idStr := ctx.Param("id")
+	nodeId, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, CodeMsgDetail(CodeUpdateNoteFailed, err.Error()))
+		return
+	}
+	updateNoteParam := models.UpdateNoteParam{}
+	if err := ctx.ShouldBindJSON(&updateNoteParam); err != nil {
+		ctx.JSON(http.StatusBadRequest, CodeMsgDetail(CodeUpdateNoteFailed, err.Error()))
+		return
+	}
+	//2.更新笔记条目
+	if err := logic.UpdateNote(nodeId, updateNoteParam); err != nil {
+		ctx.JSON(http.StatusInternalServerError, CodeMsgDetail(CodeUpdateNoteFailed, err.Error()))
+		return
+	}
+	//3.返回给客户端
+	ctx.JSON(http.StatusOK, CodeMsgDetail(CodeUpdateNoteSuccess, NoteUpdateSuccess))
 }
 
 // DeleteNote 删除一个笔记

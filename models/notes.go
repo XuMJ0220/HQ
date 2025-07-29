@@ -32,6 +32,13 @@ type CreateNoteParam struct {
 	Status     uint8  `json:"status" binding:"oneof=0 1"`
 }
 
+type UpdateNoteParam struct{
+	Title      string `json:"title"`
+	ContentMD  string `json:"content_md"`
+	CategoryID int64  `json:"category_id"`
+	Status     *uint8  `json:"status" ` //用指针来判断是否更新
+}
+
 type NoteResponse struct {
 	ID           int64     `json:"id,string"`
 	AutherName   string    `json:"author_name"`

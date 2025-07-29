@@ -24,5 +24,6 @@ func AdminRoutes(router *gin.Engine) {
 	notesRouter.POST("/", controllers.NotesController{}.AddNote) //添加一则笔记
 	notesRouter.GET("/", controllers.NotesController{}.GetAllNotes) //查询所有笔记
 	notesRouter.GET("/:id",controllers.NotesController{}.GetOneNote) //查询一条笔记
+	notesRouter.PUT("/:id",controllers.NotesController{}.UpdateNote) //更新一条指定:id的笔记
 	notesRouter.DELETE("/:id", controllers.NotesController{}.DeleteNote) //删除一条指定:id的笔记
 }

@@ -29,6 +29,8 @@ const (
 	CodeGetNoteFailed
 	CodeDelNoteSuccess
 	CodeDelNoteFailed
+	CodeUpdateNoteSuccess
+	CodeUpdateNoteFailed
 )
 
 var codeMsgMap = map[ResCode]string{
@@ -56,6 +58,8 @@ var codeMsgMap = map[ResCode]string{
 	CodeGetNoteFailed:     "获取一则笔记失败",
 	CodeDelNoteSuccess:    "删除笔记成功",
 	CodeDelNoteFailed:     "删除笔记失败",
+	CodeUpdateNoteSuccess: "更新笔记成功",
+	CodeUpdateNoteFailed:  "更新笔记失败",
 }
 
 // CodeMsgData 生成响应数据
